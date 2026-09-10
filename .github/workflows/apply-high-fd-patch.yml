@@ -1,4 +1,4 @@
-name: Apply staged high-fd patch
+name: Validate high-fd fix
 
 on:
   push:
@@ -6,26 +6,21 @@ on:
       - tmp/apply-high-fd-patch
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  apply:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: tmp/apply-high-fd-patch
-      - name: Apply and verify patch
-        shell: bash
+          ref: 7ea3b0baa56d5d06c8210fe72343b3ee02dc1c33
+          submodules: recursive
+      - name: Install build dependencies
         run: |
-          set -euo pipefail
-          echo "Applying validated high-fd patch"
-          git apply --check fix.patch
-          git apply fix.patch
-          git diff --check
-          rm fix.patch .github/workflows/apply-high-fd-patch.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "temp: apply validated high-fd fix"
-          git push origin HEAD:tmp/apply-high-fd-patch
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison flex gcc g++ git libprotobuf-dev libnl-route-3-dev libtool make pkg-config protobuf-compiler
+      - name: Build
+        run: |
+          make clean
+          make -j2
