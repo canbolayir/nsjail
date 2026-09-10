@@ -1,0 +1,31 @@
+name: Apply staged high-fd patch
+
+on:
+  push:
+    branches:
+      - tmp/apply-high-fd-patch
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: tmp/apply-high-fd-patch
+      - name: Apply and verify patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Applying validated high-fd patch"
+          git apply --check fix.patch
+          git apply fix.patch
+          git diff --check
+          rm fix.patch .github/workflows/apply-high-fd-patch.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "temp: apply validated high-fd fix"
+          git push origin HEAD:tmp/apply-high-fd-patch
