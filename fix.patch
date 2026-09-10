@@ -22,7 +22,6 @@ index 06c7534..71196c5 100644
 -	int dirfd = open("/proc/self/fd", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
 -	if (dirfd == -1) {
 -		PLOG_D("open('/proc/self/fd', O_DIRECTORY|O_RDONLY|O_CLOEXEC)");
-+
 +static bool containMakeFdsCOEProc(nsj_t* nsj, int* proc_fd) {
 +	if (*proc_fd == -1) {
  		return false;
